@@ -21,7 +21,8 @@
     <a href="blog-summer-dresses.html">Style Guide</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
-  </nav>
+  <a href="cart.html">Cart (<span id="cart-badge">0</span>)</a>
+</nav>
 </header>
 
 <div class="breadcrumb"><a href="index.html">Home</a> / <a href="category-accessories.html">Accessories</a> / Weekend Tote Bag</div>
@@ -32,7 +33,7 @@
     <p class="price">AED 199</p>
     <p class="meta">Available in 3 colors · Free returns · Ships within 1–3 days across UAE</p>
     <p>Spacious and durable, this tote fits everyday essentials with room to spare — ideal for work, weekend errands, or travel.</p>
-    <a href="#" class="btn" style="margin-top:16px;display:inline-block;">Add to Cart</a>
+    <a href="javascript:void(0)" onclick="addToCart('tote-bag')" class="btn" style="margin-top:16px;display:inline-block;">Add to Cart</a>
   </div>
 </section>
 
@@ -70,5 +71,6 @@
 {"@context":"https://schema.org","@type":"Product","name":"Weekend Tote Bag","description":"Spacious durable tote bag for everyday use.",
 "offers":{"@type":"Offer","priceCurrency":"AED","price":"199","availability":"https://schema.org/InStock"}}
 </script>
+<script src="cart.js"></script>
 </body>
 </html>
