@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | NOVA UAE</title>
+<meta name="description" content="Complete your NOVA UAE order — shipping details and payment.">
+<link rel="stylesheet" href="style.css">
+<style>
+.checkout-grid { display:grid; grid-template-columns:1.3fr 1fr; gap:40px; max-width:900px; margin:0 auto; }
+.checkout-grid input, .checkout-grid select { width:100%; padding:11px; margin-bottom:14px; border:1px solid #ddd; border-radius:4px; font-family:inherit; }
+.checkout-grid label { font-size:13px; font-weight:600; display:block; margin-bottom:4px; }
+.payment-option { border:1px solid #ddd; border-radius:6px; padding:12px; margin-bottom:10px; cursor:pointer; }
+.payment-option input { width:auto; margin-right:8px; }
+.order-box { background:var(--bg-light); border-radius:6px; padding:20px; height:fit-content; }
+.order-box .row { display:flex; justify-content:space-between; padding:5px 0; font-size:14px; }
+@media (max-width:768px) { .checkout-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">NOVA UAE</a>
+  <nav>
+    <a href="category-womens.html">Women</a>
+    <a href="category-mens.html">Men</a>
+    <a href="cart.html">Cart (<span id="cart-badge">0</span>)</a>
+  </nav>
+</header>
+
+<div class="breadcrumb"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / Checkout</div>
+
+<section style="padding-top:10px;">
+  <h1 style="font-size:28px;text-align:center;margin-bottom:30px;">Checkout</h1>
+  <div class="checkout-grid">
+    <div>
+      <h3>Shipping Details</h3>
+      <label>Full Name</label><input type="text" id="name" placeholder="Your name" required>
+      <label>Phone (WhatsApp)</label><input type="tel" id="phone" placeholder="+971 5X XXX XXXX" required>
+      <label>Address</label><input type="text" id="address" placeholder="Street, Building, Apartment" required>
+      <label>Emirate</label>
+      <select id="emirate">
+        <option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option><option>Ajman</option><option>Ras Al Khaimah</option>
+      </select>
+
+      <h3 style="margin-top:24px;">Payment Method</h3>
+      <label class="payment-option"><input type="radio" name="payment" value="Card" checked> Credit/Debit Card</label>
+      <label class="payment-option"><input type="radio" name="payment" value="COD"> Cash on Delivery</label>
+      <label class="payment-option"><input type="radio" name="payment" value="Tabby"> Tabby (Buy Now, Pay Later)</label>
+
+      <button onclick="placeOrder()" class="btn" style="width:100%;margin-top:20px;">Place Order</button>
+    </div>
+    <div class="order-box">
+      <h3>Order Summary</h3>
+      <div id="order-items"></div>
+      <div class="row" style="border-top:1px solid #ddd;margin-top:10px;padding-top:10px;font-weight:700;">
+        <span>Total</span><span id="order-total"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="footer-bottom">&copy; 2026 NOVA UAE</div></footer>
+
+<script src="cart.js"></script>
+<script>
+function renderOrderSummary() {
+  const cart = getCart();
+  const container = document.getElementById("order-items");
+  container.innerHTML = "";
+  Object.keys(cart).forEach(id => {
+    const p = PRODUCTS[id];
+    if (!p) return;
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<span>${p.name} x${cart[id]}</span><span>AED ${p.price * cart[id]}</span>`;
+    container.appendChild(row);
+  });
+  const { total } = getCartTotal();
+  document.getElementById("order-total").textContent = `AED ${total}`;
+
+  if (window.dataLayer) {
+    window.dataLayer.push({ event: "begin_checkout", ecommerce: { value: total, items: Object.keys(cart).map(id => ({item_id:id, quantity:cart[id]})) } });
+  }
+}
+
+function placeOrder() {
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+  if (!name || !phone || !address) {
+    showToast("Please fill in all shipping details");
+    return;
+  }
+  const payment = document.querySelector('input[name="payment"]:checked').value;
+  const { total } = getCartTotal();
+  const orderId = "NOVA" + Math.floor(100000 + Math.random()*900000);
+
+  const order = { orderId, name, phone, address, payment, total, date: new Date().toISOString() };
+  localStorage.setItem("nova_last_order", JSON.stringify(order));
+
+  if (window.dataLayer) {
+    window.dataLayer.push({ event: "purchase", ecommerce: { transaction_id: orderId, value: total, payment_type: payment } });
+  }
+
+  localStorage.removeItem("nova_cart");
+  window.location.href = "order-confirmation.html";
+}
+
+document.addEventListener("DOMContentLoaded", renderOrderSummary);
+</script>
+</body>
+</html>
